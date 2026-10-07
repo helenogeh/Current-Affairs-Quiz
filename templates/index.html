@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Current Affairs Quiz</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Current Affairs Quiz</h1>
+
+        <p class="intro">Test your knowledge with 100 questions.</p>
+
+        <form method="POST" id="quiz-form">
+
+            {% for question in questions %}
+
+                {% set question_number = loop.index %}
+
+                <div class="question-card">
+
+                    <h2>Question {{ question_number }}</h2>
+
+                    <p class="question-text">
+                        {{ question["question"] }}
+                    </p>
+
+                    {% for option, text in question["options"].items() %}
+
+                        <label class="option">
+                            <input
+                                type="radio"
+                                name="question{{ question_number }}"
+                                value="{{ option }}"
+                            >
+
+                            <span>{{ option }}. {{ text }}</span>
+                        </label>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endfor %}
+
+
+            <!-- PROGRESS -->
+
+            <div class="progress-container">
+
+                <div class="progress-text">
+                    <span>Progress</span>
+                    <span id="progress-text">
+                        0 / {{ questions|length }} answered
+                    </span>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT BUTTON -->
+
+            <button type="submit">
+                Submit Quiz
+            </button>
+
+
+            <!-- RETAKE BUTTON -->
+
+            <a href="/" class="retake-button">
+                Retake Quiz
+            </a>
+
+        </form>
+
+
+        <!-- SCORE -->
+
+        {% if score is not none %}
+
+            <div class="score">
+                🎉 Your Score: {{ score }} / {{ questions|length }}
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <footer>
+        <p>Created by Ogeh Helen Onyapa © 2026</p>
+    </footer>
+
+
+    <script>
+
+        const questions = document.querySelectorAll(".question-card");
+        const progressText = document.getElementById("progress-text");
+        const progressFill = document.getElementById("progress-fill");
+
+        function updateProgress() {
+
+            let answered = 0;
+
+            questions.forEach(function(question) {
+
+                const selectedAnswer = question.querySelector(
+                    'input[type="radio"]:checked'
+                );
+
+                if (selectedAnswer) {
+                    answered++;
+                }
+
+            });
+
+            const total = questions.length;
+            const percentage = (answered / total) * 100;
+
+            progressText.textContent =
+                answered + " / " + total + " answered";
+
+            progressFill.style.width = percentage + "%";
+        }
+
+
+        document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+
+            radio.addEventListener("change", updateProgress);
+
+        });
+
+
+        updateProgress();
+
+    </script>
+
+</body>
+</html>
